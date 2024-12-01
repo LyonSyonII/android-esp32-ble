@@ -133,50 +133,23 @@ class BluetoothViewModel(
 							"GattCallback",
 							"Characteristic: ${characteristic.uuid}"
 						)
-						if (characteristic.uuid == UUID.fromString("6E400003-B5A3-F393-E0A9-E50E24DCCA9E")) {
-							Log.d(
-								"GattCallback",
-								"Found read characteristic"
-							)
-							// Listen for changes on this characteristic
-							if (ActivityCompat.checkSelfPermission(
-									context,
-									Manifest.permission.BLUETOOTH_CONNECT
-								) != PackageManager.PERMISSION_GRANTED
-							) {
-								// TODO: Consider calling
-								//    ActivityCompat#requestPermissions
-								// here to request the missing permissions, and then overriding
-								//   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-								//                                          int[] grantResults)
-								// to handle the case where the user grants the permission. See the documentation
-								// for ActivityCompat#requestPermissions for more details.
-								return
-							}
-							gatt.setCharacteristicNotification(
-								characteristic,
-								true
-							)
-							// this is essential to be able to read the characteristic
-							val descriptor = characteristic.getDescriptor(
-								// DO NOT DELETE
-								UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
-							)
-							// DO NOT DELETE
-							descriptor.setValue(
-								// DO NOT DELETE
-								BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-							)
-							// DO NOT DELETE
-							gatt.writeDescriptor(descriptor)
-						}
-						if (characteristic.uuid == UUID.fromString("6E400002-B5A3-F393-E0A9-E50E24DCCA9E")) {
-							Log.d(
-								"GattCallback",
-								"Found write characteristic"
-							)
-							writeCharacteristic = characteristic
-						}
+                        if (ActivityCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.BLUETOOTH_CONNECT
+                            ) != PackageManager.PERMISSION_GRANTED
+                        ) {
+                            // TODO: Consider calling
+                            //    ActivityCompat#requestPermissions
+                            // here to request the missing permissions, and then overriding
+                            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                            //                                          int[] grantResults)
+                            // to handle the case where the user grants the permission. See the documentation
+                            // for ActivityCompat#requestPermissions for more details.
+                            return
+                        }
+                        gatt.readCharacteristic(characteristic);
+
+
 						characteristic.descriptors.forEach { descriptor ->
 							Log.d(
 								"GattCallback",
@@ -217,6 +190,18 @@ class BluetoothViewModel(
 				receivedData.value = readValue
 				messageHandler(readValue)
 			}
+		}
+
+		override fun onCharacteristicRead(
+			gatt: BluetoothGatt,
+			characteristic: BluetoothGattCharacteristic,
+			value: ByteArray,
+			status: Int
+		) {
+
+			val s = value.toString(Charsets.UTF_8);
+			println("Read characteristic: $s")
+			receivedData.value = s
 		}
 	}
 

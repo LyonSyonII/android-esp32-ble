@@ -93,6 +93,9 @@ fun BluetoothScreen() {
 												"BluetoothScreen",
 												"Service UUID: ${service.uuid}"
 											)
+											gatt.readCharacteristic(service.characteristics.first())
+											return
+
 											service.characteristics.forEach { characteristic ->
 												Log.d(
 													"BluetoothScreen",
@@ -150,6 +153,7 @@ fun BluetoothScreen() {
 										)
 									}
 								}
+
 							})
 					}) {
 						Text(text = "Connect")
